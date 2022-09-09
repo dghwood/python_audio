@@ -1,4 +1,4 @@
-import base 
+from python_audio import base 
 import numpy as np
 
 class WavReadFile(base.BaseAudioReadFile):
