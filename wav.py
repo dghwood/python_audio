@@ -2,8 +2,11 @@ from . import base
 import numpy as np
 
 class WavReadFile(base.BaseAudioReadFile):
-  """ Sample Usage 
+  """ WavReadFile
 
+    Implementation based on http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
+  
+    Sample Usage 
 
     wav_file = WavReadFile('samples/easy.wav')
     print(wav_file.numpy.shape, wav_file.numpy.dtype)
@@ -20,6 +23,8 @@ class WavReadFile(base.BaseAudioReadFile):
   @property 
   def num_channels(self):
     return self._num_channels
+
+  DTYPES = [np.uint8, np.uint16, np.uint32, np.uint64]
 
   def _parse_file(self, open_file):
     """ Based on  http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html 
@@ -61,12 +66,13 @@ class WavReadFile(base.BaseAudioReadFile):
     data_cksize = self._parse_int(open_file.read(4))
     channel_bits = int(nBlockAlign / self._num_channels)
 
-    dtype = [np.uint8, np.uint16, np.uint32, np.uint64][channel_bits - 1] 
+    if channel_bits > len(self.DTYPES):
+      raise Exception('Unsupported bits per sample')
 
     self._data = np.array([
       [self._parse_int(open_file.read(channel_bits)) for j in range(self._num_channels)]
       for i in range(0, data_cksize, channel_bits)
-    ], dtype = dtype)
+    ], dtype = self.DTYPES[channel_bits - 1])
 
 def numpy_from_file(file_name):
   w = WavReadFile(file_name)
