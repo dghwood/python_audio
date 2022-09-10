@@ -69,4 +69,5 @@ class WavReadFile(base.BaseAudioReadFile):
     ], dtype = dtype)
 
 def numpy_from_file(file_name):
-  return WavReadFile(file_name).numpy 
+  w = WavReadFile(file_name)
+  return w.numpy, w.samples_per_sec 
